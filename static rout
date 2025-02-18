@@ -1,0 +1,22 @@
+SAMPLE OF STATIC ROUTE CONFIGURATION
+
+UNIT-02 # show router static 
+config router static
+    edit 1
+        set gateway 10.0.0.254
+        set device "wan2"
+    next
+    edit 2
+        set device "S2S_UNIT-01"  # vpn interface
+        set comment "S2S_UNIT-01 - virtual interface
+        set dstaddr "S2S_UNIT-01_remote"  insted of address group name can be used also: set dst 10.0.201.0 255.255.255.0       
+
+    next
+    edit 3
+        set distance 254
+        set blackhole enable
+        set dstaddr "S2S_UNIT-01_remote"
+        set vrf 0
+    next
+end
+
