@@ -1,0 +1,138 @@
+UNIT 01 Configuration
+______________________________________________________________________________________________
+
+config vpn ipsec phase1-interface
+edit S2S_UNIT-02
+    set interface wan1
+    set ike-version 2
+    set local-gw 172.16.100.1
+    set proposal aes256-sha256 aes256-sha384 aes256-sha512 aes128-sha256 aes128-sha384 aes128-sha512
+    set dhgrp 5 14
+    set nattraversal disable
+    set remote-gw 172.16.100.2
+    set psksecret v7P$m@8F!jK#L2qW&R9cZ$x4Gt@T2kM^
+next
+end
+
+
+config vpn ipsec phase2-interface
+edit UNIT01_Sub_01_UNIT02_Sub_01
+    set phase1name S2S_UNIT-02
+    set proposal aes256-sha256
+    set dhgrp 5
+    set src-subnet 10.0.201.0 255.255.255.0
+    set dst-subnet 10.0.202.0 255.255.255.0
+next
+end
+
+config firewall policy
+edit 0
+    set name "VPN-Outbound"
+    set srcintf "lan"
+    set dstintf "S2S_UNIT-02"
+    set srcaddr "all"
+    set dstaddr "all"
+    set action accept
+    set schedule "always"
+    set service "ALL"
+next
+end
+
+config firewall policy
+edit 0
+    set name "VPN-Inbound"
+    set srcintf "S2S_UNIT-02"
+    set dstintf "lan"
+    set srcaddr "all"
+    set dstaddr "all"
+    set action accept
+    set schedule "always"
+    set service "ALL"
+next
+end
+
+
+config router static
+    edit 0
+        set dst 10.0.202.0/24    
+        set gateway 172.16.100.1    
+        set device "S2S_UNIT-02"
+    next
+    edit 2 
+	set dst 10.0.202.0 255.255.255.0
+        set distance 254
+        set blackhole enable
+        set vrf 0
+    next
+end	
+
+
+end
+_____________________________________________________________________________________________
+
+UNIT 02 Configuration
+______________________________________________________________________________________________
+
+config vpn ipsec phase1-interface
+edit S2S_UNIT-01
+    set interface wan1
+    set ike-version 2
+    set local-gw 172.16.100.2
+    set proposal aes256-sha256 aes256-sha384 aes256-sha512 aes128-sha256 aes128-sha384 aes128-sha512
+    set dhgrp 5 14
+    set nattraversal disable
+    set remote-gw 172.16.100.1
+    set psksecret v7P$m@8F!jK#L2qW&R9cZ$x4Gt@T2kM^
+next
+end
+
+
+config vpn ipsec phase2-interface
+edit UNIT02_Sub_01_UNIT01_Sub_01
+    set phase1name S2S_UNIT-01
+    set proposal aes256-sha256
+    set dhgrp 5
+    set src-subnet 10.0.202.0 255.255.255.0
+    set dst-subnet 10.0.201.0 255.255.255.0
+next
+end
+
+config firewall policy
+edit 0
+    set name "VPN-Outbound"
+    set srcintf "lan"
+    set dstintf "S2S_UNIT-01"
+    set srcaddr "all"
+    set dstaddr "all"
+    set action accept
+    set schedule "always"
+    set service "ALL"
+next
+end
+
+config firewall policy
+edit 0
+    set name "VPN-Inbound"
+    set srcintf "S2S_UNIT-01"
+    set dstintf "lan"
+    set srcaddr "all"
+    set dstaddr "all"
+    set action accept
+    set schedule "always"
+    set service "ALL"
+next
+end
+
+config router static
+    edit 1
+        set dst 10.0.201.0/24    
+        set gateway 172.16.100.2
+        set device "S2S_UNIT-01"
+	  next
+    edit 2 
+	set dst 10.0.201.0 255.255.255.0
+        set distance 254
+        set blackhole enable
+        set vrf 0
+    next
+end	
